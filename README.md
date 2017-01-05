@@ -8,6 +8,37 @@ The task is activated via a POST request to `/bq-task` with the same JSON as pas
 
 See the [Google App Engine Samples](https://github.com/MarkEdmondson1234/python-docs-samples/tree/master/appengine/standard) for how to deploy.
 
+## Setup
+
+1. Create a dataset and date partitioned BigQuery table to receive the hits.
+* Create empty table > set table name > add schema > Options: Partitioning to "DAY"
+2. Add any other fields to the table that you wish to send in, the script by default also adds `timestamp` and `cache_id` so you can add those to see them. Any unset fields won't be seen.
+3. Edit the `app.yaml` field `env_variables` to your BigQuery details:
+
+Example:
+
+```
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: .*
+  script: main.app
+
+#[START env]
+env_variables:
+  DATASET_ID: tests
+  TABLE_ID: realtime
+#[END env]
+```
+
+3. Deploy the app (see below)
+4. Call the `https://your-app-id.appost.com/bq-streamer?bq={'example1','example2'}`  to add the fields to your BigQuery table.
+5. The data won't appear in the table preview yet but you can query the table via something like `SELECT * FROM dataset.tableID` to see the hits. 
+6. View the logs for any errors `https://console.cloud.google.com/logs/viewer`
+
+ 
 ## Running the samples locally
 
 1. Download the [Google App Engine Python SDK](https://cloud.google.com/appengine/downloads) for your platform.
@@ -26,13 +57,16 @@ Some samples may require additional setup. Refer to individual sample READMEs.
 ## Deploying the samples
 
 1. Download the [Google App Engine Python SDK](https://cloud.google.com/appengine/downloads) for your platform.
-2. Many samples require extra libraries to be installed. If there is a `requirements.txt`, you will need to install the dependencies with [`pip`](pip.readthedocs.org).
+2. Open terminal then browse to the folder containing `app.yaml`
+3. The app requires extra libraries to be installed. You need to install the dependencies with [`pip`](pip.readthedocs.org).
+
+This installs the libraries to a new folder `lib` in the app directory.  It most likely won't need to add anything.
 
         pip install -t lib -r requirements.txt
 
-3. Browse to the directory holding the `app.yaml` then issue:
+4. Deploy via:
 
-        gcloud app deploy —project [YOUR_PROJECT_ID]
+        gcloud app deploy --project [YOUR_PROJECT_ID]
 
 Optional flags:
 

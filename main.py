@@ -20,12 +20,15 @@ def stream_data(dataset_name, table_name, json_data):
     table.reload()
 
     rows = [data]
+
+
+    logging.debug(rows)
     errors = table.insert_data(rows)
 
     if not errors:
     	logging.debug('Loaded 1 row into {}:{}'.format(dataset_name, table_name))
     else:
-        logging.errors(errors)
+        logging.error(errors)
 
 class MainHandler(webapp2.RequestHandler):
 	def get(self):
@@ -44,9 +47,6 @@ class BqHandler(webapp2.RequestHandler):
 		## get example.com/bq-task?bq=blah
 		b = self.request.get("bq")
 		b = json.loads(b)
-
-		b['timestamp'] = int(time.time())
-		b['cache_id']  = str(uuid.uuid4())
 
 		logging.debug(b)
 
