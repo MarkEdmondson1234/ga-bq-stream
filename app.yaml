@@ -1,0 +1,13 @@
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: .*
+  script: main.app
+
+#[START env]
+env_variables:
+  DATASET_ID: tests
+  TABLE_ID: realtime
+#[END env]
