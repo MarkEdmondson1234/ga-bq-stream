@@ -10,7 +10,7 @@ See the [Google App Engine Samples](https://github.com/MarkEdmondson1234/python-
 
 ## Setup
 
-1. Create a dataset and date partitioned BigQuery table to receive the hits.
+1. Create a dataset and date partitioned BigQuery table to receive the hits. Probably want to delete data after some time in prod.
 * Create empty table > set table name > add schema > Options: Partitioning to "DAY"
 2. Add any other fields to the table that you wish to send in, the script by default also adds `ts` as a STRING that is a UNIX timestamp so add that too. Any unset fields won't be seen by default.
 3. Edit the `app.yaml` field `env_variables` to your BigQuery details:
@@ -41,28 +41,15 @@ For testing you can call in the browser the URL via `GET` but for production cal
 Other examples:
 
 `
-https://your-app-id.appspot.com/bq-streamer?bq={%22hello2%22:%22blah5%22,%20%22hello%22:%22hi%22}
+https://your-app-id.appspot.com/bq-streamer?bq={'hello':'blah5','hello':'hi'}
 `
-5. The data won't appear in the table preview yet but you can query the table via something like `SELECT * FROM dataset.tableID` to see the hits. Turn off `USE CACHED RESULTS`.
+
+
+5. The data won't appear in the BQ table preview quickly but you can query the table via something like `SELECT * FROM dataset.tableID` to see the realtime hits seconds after the hit it made. Turn off `USE CACHED RESULTS`.  It also adds a `ts` field with a unix timestamp of when the hit was sent to BigQuery.
+
 6. View the logs for any errors `https://console.cloud.google.com/logs/viewer`
 
- 
-## Running the samples locally
-
-1. Download the [Google App Engine Python SDK](https://cloud.google.com/appengine/downloads) for your platform.
-2. Many samples require extra libraries to be installed. If there is a `requirements.txt`, you will need to install the dependencies with [`pip`](pip.readthedocs.org).
-
-        pip install -t lib -r requirements.txt
-
-3. Use `dev_appserver.py` to run the sample:
-
-        dev_appserver.py app.yaml
-
-4. Visit `http://localhost:8080` to view your application.
-
-Some samples may require additional setup. Refer to individual sample READMEs.
-
-## Deploying the samples
+## Deploying
 
 1. Download the [Google App Engine Python SDK](https://cloud.google.com/appengine/downloads) for your platform.
 2. Open terminal then browse to the folder containing `app.yaml`
@@ -81,7 +68,7 @@ Optional flags:
 * Include the `--project` flag to specify an alternate Cloud Platform Console project ID to what you initialized as the default in the gcloud tool. Example: `--project [YOUR_PROJECT_ID]`
 * Include the -v flag to specify a version ID, otherwise one is generated for you. Example: `-v [YOUR_VERSION_ID]`
 
-4. Visit `https://your-app-id.appost.com` to view your application.
+5. Visit `https://your-app-id.appost.com` to view your application.
 
 ## Additional resources
 
@@ -96,5 +83,13 @@ For more information on Python on App Engine:
 # Quotas and limits
 
 * Maximum 32MB per HTTP request
-* task quests: 1000M if paid, 100k if free
-* 500 tasks per second per queue
+* concurrent task queues: 1000M if paid, 100k if free
+* 500 tasks per second per queue = 1.8M per hour = 43.2M per day
+
+# Using the BigQuery realtime
+
+TODO
+
+# Sending hits from Google Tag Manager
+
+TODO
