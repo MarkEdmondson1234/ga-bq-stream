@@ -1,4 +1,4 @@
-import webapp2, json, logging, os, time, uuid
+import webapp2, json, logging, os, time, uuid, hashlib
 
 from google.cloud import bigquery
 from google.appengine.api import memcache, taskqueue
@@ -129,6 +129,16 @@ class QueryTable(webapp2.RequestHandler):
 	def get(self):
 
 		q = self.request.get("q")
+		hash = self.request.get("hash")
+
+		salt = os.environ['SECRET_SALT']
+		test = hashlib.sha224(q+salt).hexdigest()
+
+		if(test != hash):
+			logging.debug('Real hash (remove this in prod): {}'.format(test))
+			logging.error("Incorrect hash")
+			return
+
 		self.response.headers.add_header("Content-Type", "application/json")
 		self.response.out.write(get_data(q))
 

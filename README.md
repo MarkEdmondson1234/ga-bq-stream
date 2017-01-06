@@ -13,7 +13,7 @@ See the [Google App Engine Samples](https://github.com/MarkEdmondson1234/python-
 1. Create a dataset and date partitioned BigQuery table to receive the hits. Probably want to delete data after some time in prod.
 * Create empty table > set table name > add schema > Options: Partitioning to "DAY"
 2. Add any other fields to the table that you wish to send in, the script by default also adds `ts` as a STRING that is a UNIX timestamp so add that too. Any unset fields won't be seen by default.
-3. Edit the `app.yaml` field `env_variables` to your BigQuery details:
+3. Edit the `app.yaml` field `env_variables` to your BigQuery details, and your secret code word:
 
 Example:
 
@@ -30,6 +30,7 @@ handlers:
 env_variables:
   DATASET_ID: tests
   TABLE_ID: realtime
+  SECRET_SALT: changethistosomethingunique
 #[END env]
 ```
 
@@ -124,9 +125,21 @@ By default the query is:
 
 You can use your own query by supplying a `q` parameter to the URL.  Use %s.%s as above for the table from:
 
-`http://your-app-id.appspot.com/bq-get?q=SELECT * FROM %s.%s LIMIT 10`
+`http://your-app-id.appspot.com/bq-get?hash=XXXXXq=SELECT * FROM %s.%s LIMIT 10`
 
-This is not a good idea on a public URL!
+To protect privacy, a hash also has to be supplied.  This is generated via the secret salt name you should change in setup to something unique for you, and then generate it in python via:
+
+```
+import hashlib
+# your query
+q = "SELECT * FROM %s.%s"
+# the unique secret word in the app.yaml environment vars
+salt = "SECRETWORD"
+
+## use this in the API call for parameter `hash`
+hashlib.sha224(q+salt).hexdigest()
+
+```
 
 Applications can then use this data for display.  
 

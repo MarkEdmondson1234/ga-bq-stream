@@ -10,4 +10,5 @@ handlers:
 env_variables:
   DATASET_ID: tests
   TABLE_ID: realtime
+  SECRET_SALT: changethistosomethingunique
 #[END env]
