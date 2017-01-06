@@ -12,7 +12,7 @@ See the [Google App Engine Samples](https://github.com/MarkEdmondson1234/python-
 
 1. Create a dataset and date partitioned BigQuery table to receive the hits.
 * Create empty table > set table name > add schema > Options: Partitioning to "DAY"
-2. Add any other fields to the table that you wish to send in, the script by default also adds `timestamp` and `cache_id` so you can add those to see them. Any unset fields won't be seen.
+2. Add any other fields to the table that you wish to send in, the script by default also adds `ts` as a STRING that is a UNIX timestamp so add that too. Any unset fields won't be seen by default.
 3. Edit the `app.yaml` field `env_variables` to your BigQuery details:
 
 Example:
