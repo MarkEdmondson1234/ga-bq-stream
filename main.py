@@ -35,7 +35,20 @@ def stream_data(dataset_name, table_name, json_data, time_stamp = time.time()):
         logging.error(errors)
 
 class MainHandler(webapp2.RequestHandler):
+
+	## for debugging
 	def get(self):
+		## allows CORS
+		self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+
+		## get example.com?bq=blah
+		b = self.request.get("bq")
+
+		## send to async task URL
+		task = taskqueue.add(url='/bq-task', params={'bq': b, 'ts': str(time.time())})
+
+	# use in prod
+	def post(self):
 		## allows CORS
 		self.response.headers.add_header("Access-Control-Allow-Origin", "*")
 
