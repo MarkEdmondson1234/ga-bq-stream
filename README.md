@@ -34,8 +34,8 @@ env_variables:
 ```
 
 3. Deploy the app (see below)
-4. Call the `https://your-app-id.appost.com/bq-streamer?bq={"this_is_json":"yes"}`  to add the fields to your BigQuery table.
-5. The data won't appear in the table preview yet but you can query the table via something like `SELECT * FROM dataset.tableID` to see the hits. Turn off ÙSE CACHED RESULTS`
+4. Call the `https://your-app-id.appost.com/bq-streamer?bq={"field_name":"field_value", "field_name2":"field_value2"}`  to add the fields to your BigQuery table.
+5. The data won't appear in the table preview yet but you can query the table via something like `SELECT * FROM dataset.tableID` to see the hits. Turn off `USE CACHED RESULTS`.
 6. View the logs for any errors `https://console.cloud.google.com/logs/viewer`
 
  

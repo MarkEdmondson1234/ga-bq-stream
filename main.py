@@ -1,12 +1,8 @@
-import webapp2, json, logging, os
-
-from pprint import pprint
+import webapp2, json, logging, os, time, uuid
 
 from google.cloud import bigquery
 from google.appengine.api import memcache, taskqueue
-
 from datetime import date, timedelta
-import time, uuid
 
 ## https://cloud.google.com/bigquery/streaming-data-into-bigquery
 ## function to send data to BQ stream
@@ -22,11 +18,16 @@ def stream_data(dataset_name, table_name, json_data, time_stamp = time.time()):
     # Reload the table to get the schema.
     table.reload()
 
-    rows = [data]
+    ## get the names of schema
+    schema = table.schema
+    schema_names = [o.name for o in schema]
 
-    logging.debug(rows)
+    logging.debug(schema_names)
+    # from schema names get list of tuples of the values
+    rows = [(data[x] for x in schema_names)]
+
     # https://googlecloudplatform.github.io/google-cloud-python/stable/bigquery-table.html#google.cloud.bigquery.table.Table.insert_data
-    errors = table.insert_data(rows, row_ids = str(uuid.uuid4()), ignore_unknown_values=False)
+    errors = table.insert_data(rows, row_ids = str(uuid.uuid4()))
 
     if not errors:
     	logging.debug('Loaded 1 row into {}:{}'.format(dataset_name, table_name))
@@ -42,18 +43,18 @@ class MainHandler(webapp2.RequestHandler):
 		b = self.request.get("bq")
 
 		## send to async task URL
-		task = taskqueue.add(url='/bq-task', params={'bq': b, '_ts': str(time.time())})
+		task = taskqueue.add(url='/bq-task', params={'bq': b, 'ts': str(time.time())})
 
 class BqHandler(webapp2.RequestHandler):
 	def post(self):
 
 		## get example.com/bq-task?bq=blah
 		b = self.request.get("bq")
-		ts = self.request.get("_ts")
+		ts = self.request.get("ts")
 
 		b = json.loads(b)
 
-		logging.debug(b)
+		logging.debug('json load: {}'.format(b))
 
 		if len(b) > 0:
 			datasetId = os.environ['DATASET_ID']
