@@ -92,3 +92,9 @@ For more information on App Engine:
 For more information on Python on App Engine:
 
 > https://cloud.google.com/appengine/docs/python
+
+# Quotas and limits
+
+* Maximum 32MB per HTTP request
+* task quests: 1000M if paid, 100k if free
+* 500 tasks per second per queue

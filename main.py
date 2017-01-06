@@ -22,7 +22,8 @@ def stream_data(dataset_name, table_name, json_data, time_stamp = time.time()):
     schema = table.schema
     schema_names = [o.name for o in schema]
 
-    logging.debug(schema_names)
+    logging.debug('BQ Schema: {}'.format(schema_names))
+
     # from schema names get list of tuples of the values
     rows = [(data[x] for x in schema_names)]
 
