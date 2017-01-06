@@ -4,6 +4,50 @@ from google.cloud import bigquery
 from google.appengine.api import memcache, taskqueue
 from datetime import date, timedelta
 
+# https://cloud.google.com/bigquery/querying-data#bigquery-sync-query-python
+def sync_query(query):
+    client = bigquery.Client()
+    query_results = client.run_sync_query(query)
+
+    # Use standard SQL syntax for queries.
+    # See: https://cloud.google.com/bigquery/sql-reference/
+    query_results.use_legacy_sql = False
+
+    query_results.run()
+
+    # Drain the query results by requesting a page at a time.
+    page_token = None
+    bqdata = []
+
+    while True:
+        rows, total_rows, page_token = query_results.fetch_data(
+            max_results=10,
+            page_token=page_token)
+
+        bqdata.extend(rows)
+
+        for row in rows:
+            logging.debug(row)
+
+        if not page_token:
+            break
+
+    return bqdata
+
+# queries and turns into JSON
+def get_data(q):
+	datasetId = os.environ['DATASET_ID']
+	tableId   = os.environ['TABLE_ID']
+
+	if len(q) > 0:
+		query = q % (datasetId, tableId)
+	else:
+		query = 'SELECT * FROM %s.%s LIMIT 1000' % (datasetId, tableId)
+
+	bqdata = sync_query(query)
+
+	return json.dumps(bqdata)
+
 ## https://cloud.google.com/bigquery/streaming-data-into-bigquery
 ## function to send data to BQ stream
 ## https://github.com/GoogleCloudPlatform/python-docs-samples/blob/master/bigquery/cloud-client/stream_data.py
@@ -81,7 +125,15 @@ class BqHandler(webapp2.RequestHandler):
 			stream_data(datasetId, tableId, b, ts)
 
 
+class QueryTable(webapp2.RequestHandler):
+	def get(self):
+
+		q = self.request.get("q")
+		self.response.headers.add_header("Content-Type", "application/json")
+		self.response.out.write(get_data(q))
+
 app = webapp2.WSGIApplication([
     ('/bq-streamer', MainHandler),
-    ('/bq-task', BqHandler)
+    ('/bq-task', BqHandler),
+    ('/bq-get', QueryTable)
 ], debug=True)

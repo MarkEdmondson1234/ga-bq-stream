@@ -1,6 +1,6 @@
 # Stream Google Analytics data to BigQuery via Google App Engine
 
-This is a Google App Engine application for streaming JSON into BigQuery
+This is a Google App Engine application for streaming JSON into BigQuery, inspired by [Luke Cempre's post on AnalyticsPros](https://www.analyticspros.com/blog/data-science/streaming-prebid-data-google-bigquery/)
 
 When you request the URL `/bq-streamer` with the parameter `?bq={'json':'example'}` then it will start a new task to put that JSON into a partitioned table in BigQuery.
 
@@ -85,11 +85,69 @@ For more information on Python on App Engine:
 * Maximum 32MB per HTTP request
 * concurrent task queues: 1000M if paid, 100k if free
 * 500 tasks per second per queue = 1.8M per hour = 43.2M per day
+* 100k rows per second per BQ table
 
 # Using the BigQuery realtime
 
-TODO
+Included is also a class to query the entire BigQuery table, in production you would want to limit query to greater than a timestamp in ts to avoid it being too large.
+
+Visiting `http://your-app-id.appspot.com/bq-get` will get you the BQ table in JSON format:
+
+```
+[
+  ["ts", "1483705837.05", null],
+  ["blah4", "1483710114.48", null],
+  ["1", "4", null],
+  ["1", "4", null],
+  ["this_is_json", "ts", null],
+  ["h2i", "1483714626.43", "blah6"],
+  ["y", "e", null],
+  ["blah3", "1483707843.84", null],
+  ["1", "4", null],
+  ["y", "e", null],
+  ["y", "e", null],
+  ["blah3", "1483709017.45", null],
+  ["y", "e", null],
+  ["h2i", "1483714325.09", "blah6"],
+  ["blah3", "1483710007.28", null],
+  ["1", "4", null],
+  ["h23i", "1483716480.93", "bl8h7"],
+  ["hi", "1483710547.94", "blah5"],
+  ["h2i", "1483716200.83", "blah7"]
+]
+```
+By default the query is:
+
+```
+    query = 'SELECT * FROM %s.%s LIMIT 1000' % (datasetId, tableId)
+```
+
+You can use your own query by supplying a `q` parameter to the URL.  Use %s.%s as above for the table from:
+
+`http://your-app-id.appspot.com/bq-get?q=SELECT * FROM %s.%s LIMIT 10`
+
+This is not a good idea on a public URL!
+
+Applications can then use this data for display.  
+
+* Poll every minute from GoogleSheets https://cloud.google.com/solutions/real-time/fluentd-bigquery
+* Js: http://epochjs.github.io/epoch/
+* https://www.quora.com/What-s-a-good-real-time-data-visualization-framework 
+* http://stackoverflow.com/questions/33480302/creating-a-shiny-app-with-real-time-data
+* http://shiny.rstudio.com/gallery/reactive-poll-and-file-reader.html
+* http://stackoverflow.com/questions/40424407/real-time-chart-on-r-shiny
 
 # Sending hits from Google Tag Manager
 
-TODO
+```
+<script>
+  var clientId = {{Client ID}};
+    
+	var bqArray = [];
+        
+  bqArray.push({{dataLayer.thingy}});
+  	
+  jQuery.post("https://YOUR-PROJECT-ID.appspot.com/bq-streamer", {"bq":JSON.stringify(bqArray)})
+
+</script>
+```
