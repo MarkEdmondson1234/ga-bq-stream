@@ -42,7 +42,7 @@ For testing you can call in the browser the URL via `GET` but for production cal
 Other examples:
 
 `
-https://your-app-id.appspot.com/bq-streamer?bq={'hello':'blah5','hello':'hi'}
+https://your-app-id.appspot.com/bq-streamer?bq={'bar':'blah5','foo':'hi'}
 `
 
 
@@ -92,7 +92,7 @@ For more information on Python on App Engine:
 
 Included is also a class to query the entire BigQuery table, in production you would want to limit query to greater than a timestamp in ts to avoid it being too large.
 
-Visiting `http://your-app-id.appspot.com/bq-get` will get you the BQ table in JSON format:
+Visiting `http://your-app-id.appspot.com/bq-get` will get you the BQ table in JSON format - it has no caching enabled so it will also be the freshest results:
 
 ```
 [
@@ -123,7 +123,7 @@ By default the query is:
     query = 'SELECT * FROM %s.%s LIMIT 1000' % (datasetId, tableId)
 ```
 
-You can use your own query by supplying a `q` parameter to the URL.  Use %s.%s as above for the table from:
+You can use your own query by supplying a `q` parameter to the URL.  It uses Standard SQL, not legacy.  Use the `%s.%s` in your query that will be filled in with the correct dataset and tableId.
 
 `http://your-app-id.appspot.com/bq-get?hash=XXXXXq=SELECT * FROM %s.%s LIMIT 10`
 
