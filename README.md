@@ -171,13 +171,15 @@ Applications can then use this data for display.
 
 ```
 <script>
-  var clientId = {{Client ID}};
     
-	var bqArray = [];
+	var bqArray = {};
         
-  bqArray.push({{dataLayer.thingy}});
+  bqArray["fieldname"] = "{{dataLayer}}";
+  bqArray["fieldname2"] = "{{dataLayer2}}";
   	
-  jQuery.post("https://YOUR-PROJECT-ID.appspot.com/bq-streamer", {"bq":JSON.stringify(bqArray)})
+  jQuery.post("https://YOUR-PROJECT-ID.appspot.com/bq-streamer", {"bq":JSON.stringify(bqArray)});
+  }
+  }
 
 </script>
 ```
