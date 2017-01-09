@@ -92,7 +92,36 @@ For more information on Python on App Engine:
 
 Included is also a class to query the entire BigQuery table, in production you would want to limit query to greater than a timestamp in ts to avoid it being too large.
 
-Visiting `http://your-app-id.appspot.com/bq-get` will get you the BQ table in JSON format - it has no caching enabled so it will also be the freshest results:
+Visiting `http://your-app-id.appspot.com/bq-get` will get you the BQ table in JSON format - it has no caching enabled so it will also be the freshest results.
+
+## Hash
+
+To protect privacy, a hash also has to be supplied.  This is generated via the secret salt name you should change in setup to something unique for you, and then generate it in python via:
+
+```
+import hashlib
+# your query
+q = "SELECT * FROM %s.%s"
+# the unique secret word in the app.yaml environment vars
+salt = "SECRETWORD"
+
+## use this in the API call for parameter `hash`
+hashlib.sha224(q+salt).hexdigest()
+
+```
+ Or view the expected hash in the error logs when you attempt connection
+
+ ## Limit
+
+ By default it will return the most recent record of the table - pass `limit=X` to get more.
+
+ Example:
+
+ `http://your-app-id.appspot.com/bq-get?limit=1000&hash=63780cbd6c3f6e632b57d9f8f70ea7edcd3c6eb5cbdd1b3183ba28b6`
+
+ ## Output
+
+The output is a list of lists like this:
 
 ```
 [
@@ -117,29 +146,17 @@ Visiting `http://your-app-id.appspot.com/bq-get` will get you the BQ table in JS
   ["h2i", "1483716200.83", "blah7"]
 ]
 ```
+
 By default the query is:
 
 ```
-    query = 'SELECT * FROM %s.%s LIMIT 1000' % (datasetId, tableId)
+    query = 'SELECT * FROM %s.%s LIMIT %s' % (datasetId, tableId, limit)
 ```
 
-You can use your own query by supplying a `q` parameter to the URL.  It uses Standard SQL, not legacy.  Use the `%s.%s` in your query that will be filled in with the correct dataset and tableId.
+You can use your own query by supplying a `q` parameter to the URL.  It uses Standard SQL, not legacy.  Use the `%s.%s` in your query that will be filled in with the correct dataset and tableId.  The limit URL parameter is ignored when supplying your own SQL.
 
 `http://your-app-id.appspot.com/bq-get?hash=XXXXXq=SELECT * FROM %s.%s LIMIT 10`
 
-To protect privacy, a hash also has to be supplied.  This is generated via the secret salt name you should change in setup to something unique for you, and then generate it in python via:
-
-```
-import hashlib
-# your query
-q = "SELECT * FROM %s.%s"
-# the unique secret word in the app.yaml environment vars
-salt = "SECRETWORD"
-
-## use this in the API call for parameter `hash`
-hashlib.sha224(q+salt).hexdigest()
-
-```
 
 Applications can then use this data for display.  
 

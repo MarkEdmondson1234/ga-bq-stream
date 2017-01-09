@@ -1,4 +1,4 @@
-import webapp2, json, logging, os, time, uuid, hashlib
+import webapp2, json, logging, os, time, uuid, hashlib, cgi
 
 from google.cloud import bigquery
 from google.appengine.api import memcache, taskqueue
@@ -36,14 +36,14 @@ def sync_query(query):
     return bqdata
 
 # queries and turns into JSON
-def get_data(q):
+def get_data(q, limit = 1):
 	datasetId = os.environ['DATASET_ID']
 	tableId   = os.environ['TABLE_ID']
 
 	if len(q) > 0:
 		query = q % (datasetId, tableId)
 	else:
-		query = 'SELECT * FROM %s.%s ORDER BY ts DESC LIMIT 1000' % (datasetId, tableId)
+		query = 'SELECT * FROM %s.%s ORDER BY ts DESC LIMIT %s' % (datasetId, tableId, limit)
 
 	bqdata = sync_query(query)
 
@@ -130,24 +130,29 @@ class QueryTable(webapp2.RequestHandler):
 
 	def get(self):
 
+        # no caching
 		self.response.headers.add_header("Access-Control-Allow-Origin", "*")
 		self.response.headers.add_header("Pragma", "no-cache")
 		self.response.headers.add_header("Cache-Control", "no-cache, no-store, must-revalidate, pre-check=0, post-check=0")
 		self.response.headers.add_header("Expires", "Thu, 01 Dec 1994 16:00:00")
+		self.response.headers.add_header("Content-Type", "application/json")
 
-		q = self.request.get("q")
-		hash = self.request.get("hash")
+		q      = cgi.escape(self.request.get("q"))
+		myhash = cgi.escape(self.request.get("hash"))
+		limit  = cgi.escape(self.request.get("limit"))
 
 		salt = os.environ['SECRET_SALT']
 		test = hashlib.sha224(q+salt).hexdigest()
 
-		if(test != hash):
-			logging.debug('Real hash (remove this in prod): {}'.format(test))
+		if(test != myhash):
+			logging.debug('Expected hash: {}'.format(test))
 			logging.error("Incorrect hash")
 			return
 
-		self.response.headers.add_header("Content-Type", "application/json")
-		self.response.out.write(get_data(q))
+		if len(limit) == 0:
+			limit = 1
+
+		self.response.out.write(get_data(q, limit))
 
 app = webapp2.WSGIApplication([
     ('/bq-streamer', MainHandler),

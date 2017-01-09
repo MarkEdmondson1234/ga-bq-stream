@@ -4,6 +4,14 @@
 		"selected_items":
 		[
 			[
+				"use_",
+				"use_query_cache"
+			],
+			[
+				"add",
+				"add_header"
+			],
+			[
 				"dataset",
 				"datasetId"
 			],
@@ -515,7 +523,7 @@
 			"file": "main.py",
 			"settings":
 			{
-				"buffer_size": 4032,
+				"buffer_size": 4414,
 				"line_ending": "Unix"
 			}
 		},
@@ -523,7 +531,7 @@
 			"file": "README.md",
 			"settings":
 			{
-				"buffer_size": 5963,
+				"buffer_size": 6114,
 				"line_ending": "Unix"
 			}
 		},
@@ -803,7 +811,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -811,15 +819,15 @@
 					"file": "main.py",
 					"settings":
 					{
-						"buffer_size": 4032,
+						"buffer_size": 4414,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3646,
-								3568
+								4274,
+								4274
 							]
 						],
 						"settings":
@@ -827,7 +835,7 @@
 							"syntax": "Packages/Python/Python.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1181.0,
+						"translation.y": 1301.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -837,15 +845,15 @@
 					"file": "README.md",
 					"settings":
 					{
-						"buffer_size": 5963,
+						"buffer_size": 6114,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4156,
-								4156
+								4843,
+								4843
 							]
 						],
 						"settings":
@@ -855,7 +863,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1645.0,
+						"translation.y": 1491.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
