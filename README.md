@@ -178,8 +178,6 @@ Applications can then use this data for display.
   bqArray["fieldname2"] = "{{dataLayer2}}";
   	
   jQuery.post("https://YOUR-PROJECT-ID.appspot.com/bq-streamer", {"bq":JSON.stringify(bqArray)});
-  }
-  }
 
 </script>
 ```

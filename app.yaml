@@ -9,6 +9,6 @@ handlers:
 #[START env]
 env_variables:
   DATASET_ID: tests
-  TABLE_ID: realtime
-  SECRET_SALT: changethistosomethingunique
+  TABLE_ID: realtime_markedmondsonme
+  SECRET_SALT: blahblahblah
 #[END env]
