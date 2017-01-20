@@ -1,13 +1,16 @@
 import webapp2, json, logging, os, time, uuid, hashlib, cgi
 
 from google.cloud import bigquery
-from google.appengine.api import memcache, taskqueue
+from google.appengine.api import memcache, taskqueue, urlfetch
 from datetime import date, timedelta
 
 # https://cloud.google.com/bigquery/querying-data#bigquery-sync-query-python
 def sync_query(query):
     client = bigquery.Client()
     query_results = client.run_sync_query(query)
+
+    ## set timeout to 60 seconds, as defualt 5 seconds too short for most BQ queries
+    urlfetch.set_default_fetch_deadline(60)
 
     # Use standard SQL syntax for queries.
     # See: https://cloud.google.com/bigquery/sql-reference/
