@@ -54,7 +54,7 @@ https://your-app-id.appspot.com/bq-streamer?bq={'bar':'blah5','foo':'hi'}
 
 1. Download the [Google App Engine Python SDK](https://cloud.google.com/appengine/downloads) for your platform.
 2. Open terminal then browse to the folder containing `app.yaml`
-3. The app requires extra libraries to be installed. You need to install the dependencies with [`pip`](pip.readthedocs.org).
+3. The app requires extra libraries to be installed. You need to install the dependencies with [`pip`](http://pip.readthedocs.org).
 
 This installs the libraries to a new folder `lib` in the app directory.  It most likely won't need to add anything.
 
